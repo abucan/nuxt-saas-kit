@@ -1,2 +1,11 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@theme {
+  --font-spectral: 'Spectral', serif;
+  --font-bricolage-grotesque: 'Bricolage Grotesque', serif;
+}
+
+body {
+  @apply font-bricolage-grotesque;
+}
