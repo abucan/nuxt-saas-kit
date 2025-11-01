@@ -29,7 +29,11 @@ export default defineAppConfig({
       },
     },
     navigationMenu: {
-      slots: {},
+      slots: {
+        list: 'space-y-0.5',
+        link: 'hover:cursor-pointer',
+        label: 'text-muted',
+      },
     },
   },
 });
