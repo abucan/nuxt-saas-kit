@@ -1,5 +1,13 @@
 export default defineAppConfig({
   ui: {
+    button: {
+      slots: {
+        base: 'hover:cursor-pointer',
+      },
+    },
+    link: {
+      base: 'hover:cursor-pointer',
+    },
     authForm: {
       slots: {
         root: 'w-full max-w-sm space-y-6',
@@ -19,6 +27,9 @@ export default defineAppConfig({
         form: 'space-y-5',
         footer: 'text-sm text-center text-muted mt-2',
       },
+    },
+    navigationMenu: {
+      slots: {},
     },
   },
 });

@@ -1,88 +1,27 @@
 <script setup lang="ts">
 import * as z from 'zod';
-import type { FormSubmitEvent, AuthFormField, ButtonProps } from '@nuxt/ui';
-
-const authForm = useTemplateRef('authForm');
+import type { FormSubmitEvent } from '@nuxt/ui';
 
 definePageMeta({
   layout: 'auth',
+  middleware: 'guest',
 });
 
 const toast = useToast();
 const { step, email, isLoading, error, sendOTP, verifyOTP, reset } = useAuth();
+const {
+  emailFields,
+  otpFields,
+  providers,
+  emailSchema,
+  otpSchema,
+  separatorConfig,
+} = useAuthForm();
 
-const fields: AuthFormField[] = [
-  {
-    name: 'email',
-    type: 'email',
-    placeholder: 'Enter your email',
-    required: true,
-    size: 'lg',
-    variant: 'ghost',
-    ui: {
-      base: 'hover:bg-background focus:bg-background text-inverted border border-gray-200 rounded-md',
-    },
-  },
-];
-
-const otpFields: AuthFormField[] = [
-  {
-    name: 'otp',
-    type: 'otp',
-    length: 6,
-    placeholder: '○',
-    size: 'xl',
-    variant: 'ghost',
-    ui: {
-      base: 'w-full hover:bg-background focus:bg-background text-inverted border border-gray-200 rounded-md',
-    },
-  },
-];
-
-const providers: ButtonProps[] = [
-  {
-    label: 'Continue with Google',
-    icon: 'i-logos-google-icon',
-    onClick: () => {
-      toast.add({ title: 'Google', description: 'Login with Google' });
-    },
-    size: 'lg',
-    variant: 'ghost',
-    class:
-      'text-inverted border border-gray-200 hover:bg-gray-50 hover:cursor-pointer rounded-full',
-  },
-  {
-    label: 'Continue with GitHub',
-    icon: 'i-simple-icons-github',
-    onClick: () => {
-      toast.add({ title: 'GitHub', description: 'Login with GitHub' });
-    },
-    size: 'lg',
-    variant: 'ghost',
-    class:
-      'text-inverted border border-gray-200 hover:bg-gray-50 hover:cursor-pointer rounded-full',
-  },
-];
-
-const schema = z.object({
-  email: z.email('Invalid email'),
-  password: z
-    .string('Password is required')
-    .min(8, 'Must be at least 8 characters'),
-});
-
-const otpSchema = z.object({
-  otp: z.string().length(6, 'OTP must be 6 digits'),
-});
-
-type Schema = z.output<typeof schema>;
+type EmailSchema = z.output<typeof emailSchema>;
 type OtpSchema = z.output<typeof otpSchema>;
 
-function onSubmit(payload: FormSubmitEvent<Schema>) {
-  console.log('Submitted', payload);
-}
-
-async function onEmailSubmit(payload: FormSubmitEvent<Schema>) {
+async function onEmailSubmit(payload: FormSubmitEvent<EmailSchema>) {
   await sendOTP(payload.data.email);
   if (!error.value) {
     toast.add({
@@ -112,25 +51,17 @@ function goBack() {
     <Transition name="step" mode="out-in">
       <UAuthForm
         v-if="step === 'email'"
-        ref="authForm"
-        :schema="schema"
+        key="email"
+        :schema="emailSchema"
+        :validate-on="['change']"
         title="Welcome back"
         description="Enter your credentials to access your account."
-        :fields="fields"
+        :fields="emailFields"
         :providers="providers"
-        @submit="onSubmit"
+        @submit="onEmailSubmit"
         :submit="{ size: 'lg', color: 'success' }"
-        :separator="{
-          label: 'OR CONTINUE WITH',
-          ui: {
-            border: 'border-gray-200',
-            label: 'text-gray-600 text-xs font-thin',
-          },
-        }"
+        :separator="separatorConfig"
       >
-        <template #separator>
-          <span>fuck off</span>
-        </template>
         <template #footer>
           By signing in, you agree to our
           <ULink to="#" class="text-primary font-medium">Terms of Service</ULink
@@ -142,22 +73,13 @@ function goBack() {
         v-else-if="step === 'otp'"
         key="otp"
         :schema="otpSchema"
+        :validate-on="['change']"
         title="Enter verification code"
         :description="`We've sent a 6-digit code to ${email}`"
         :fields="otpFields"
         @submit="onOtpSubmit"
         :submit="{ size: 'lg', color: 'success', loading: isLoading }"
       >
-        <template #header>
-          <UButton
-            variant="ghost"
-            icon="i-heroicons-arrow-left"
-            @click="goBack"
-            class="mb-4"
-          >
-            Back to email
-          </UButton>
-        </template>
         <template #footer>
           <UAlert
             v-if="error"
@@ -166,18 +88,26 @@ function goBack() {
             class="mb-4"
             :title="error"
           />
-          <p class="text-sm text-gray-600">
-            Didn't receive the code?
-            <UButton
-              variant="link"
-              size="sm"
-              :loading="isLoading"
-              @click="sendOTP(email)"
-              class="text-primary"
+          <div class="flex flex-col gap-4">
+            <p class="text-sm font-medium text-gray-600">
+              Didn't receive the code?
+              <ULink
+                as="button"
+                :loading="isLoading"
+                @click="sendOTP(email)"
+                class="text-primary"
+              >
+                Resend code
+              </ULink>
+            </p>
+            <ULink
+              as="button"
+              @click="goBack"
+              class="text-primary font-medium flex flex-row items-center justify-center gap-2"
             >
-              Resend code
-            </UButton>
-          </p>
+              <UIcon name="i-lucide-arrow-left" class="size-4" /> Back to email
+            </ULink>
+          </div>
         </template>
       </UAuthForm>
     </Transition>
