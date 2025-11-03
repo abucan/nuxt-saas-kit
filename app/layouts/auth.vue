@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import Tetris from '~/components/shared/Tetris.vue';
+</script>
+
 <template>
   <div class="flex flex-row h-screen w-full">
     <div class="w-[60%] h-screen bg-white">
@@ -9,8 +13,8 @@
       </div>
       <slot />
     </div>
-    <div class="bg-[#F2F0EF] w-[40%] h-screen flex justify-center items-center">
-      <span class="text-black">Marketing Components</span>
+    <div class="w-[40%] h-screen relative">
+      <Tetris squareColor="#61c363" />
     </div>
   </div>
 </template>
