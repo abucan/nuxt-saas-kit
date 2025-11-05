@@ -12,6 +12,38 @@ const userName = 'John Doe';
 const userAvatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=John';
 const organizationName = ref('Acme Corp');
 
+const items2: NavigationMenuItem[][] = [
+  [
+    {
+      label: 'General',
+      icon: 'i-lucide-user',
+      active: true,
+    },
+    {
+      label: 'Members',
+      icon: 'i-lucide-users',
+    },
+    {
+      label: 'Notifications',
+      icon: 'i-lucide-bell',
+    },
+  ],
+  [
+    {
+      label: 'Documentation',
+      icon: 'i-lucide-book-open',
+      to: 'https://ui.nuxt.com/docs',
+      target: '_blank',
+    },
+    {
+      label: 'Help & Feedback',
+      icon: 'i-lucide-help-circle',
+      to: 'https://github.com/nuxt/ui/issues',
+      target: '_blank',
+    },
+  ],
+];
+
 const items: NavigationMenuItem[][] = [
   [
     {
@@ -44,6 +76,7 @@ const items: NavigationMenuItem[][] = [
       children: [
         {
           label: 'Profile',
+          to: '/profile',
         },
         {
           label: 'Billing',
@@ -106,6 +139,9 @@ const items: NavigationMenuItem[][] = [
           <UDashboardSidebarCollapse />
         </template>
       </UDashboardNavbar>
+      <UDashboardToolbar>
+        <UNavigationMenu :items="items2" class="flex-1" />
+      </UDashboardToolbar>
       <div class="p-4 w-full h-full">
         <slot />
       </div>
