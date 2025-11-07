@@ -66,3 +66,12 @@ export const auth = betterAuth({
     openAPI(),
   ],
 });
+
+export type Session = typeof auth.$Infer.Session.session;
+export type User = typeof auth.$Infer.Session.user & {
+  stripeCustomerId?: string;
+};
+export type Organization = typeof auth.$Infer.Organization;
+export type ActiveOrganization = typeof auth.$Infer.ActiveOrganization;
+export type Member = typeof auth.$Infer.Member;
+export type Invitation = typeof auth.$Infer.Invitation;

@@ -142,7 +142,7 @@ const items: NavigationMenuItem[][] = [
       <UDashboardToolbar>
         <UNavigationMenu :items="items2" class="flex-1" />
       </UDashboardToolbar>
-      <div class="p-4 w-full h-full">
+      <div class="w-full h-full py-8">
         <slot />
       </div>
     </UDashboardPanel>

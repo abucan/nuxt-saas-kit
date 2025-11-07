@@ -1,76 +1,143 @@
 <script setup lang="ts">
+import * as z from 'zod';
+import type { FormSubmitEvent } from '@nuxt/ui';
+
 definePageMeta({
   layout: 'dashboard',
 });
 
-const name = ref('Ante');
-const email = ref('ante.bucan.st@gmail.com');
+const { user, pending, error, refresh } = useUser();
+const toast = useToast();
+
+const schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.email('Invalid email'),
+  image: z.string().optional(),
+});
+
+type Schema = z.infer<typeof schema>;
+
+const state = reactive({
+  name: '',
+  email: '',
+  image: undefined,
+});
+
+watch(
+  () => user.value,
+  (userData) => {
+    if (userData) {
+      state.name = userData.name ?? '';
+      state.email = userData.email ?? '';
+      state.image = undefined;
+    }
+  },
+  { immediate: true }
+);
+
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  try {
+    // TODO: Update profile
+    console.log(event.data);
+    toast.add({
+      title: 'Success',
+      description: 'Profile updated successfully',
+      color: 'success',
+    });
+
+    // await refresh();
+  } catch (err) {
+    toast.add({
+      title: 'Error',
+      description: 'Failed to update profile',
+      color: 'error',
+    });
+  }
+}
 </script>
 
 <template>
-  <div class="flex justify-center items-start min-h-screen py-8">
+  <UForm
+    :schema="schema"
+    :state="state"
+    @submit="onSubmit"
+    class="flex justify-center items-start"
+  >
     <UCard class="w-full max-w-2xl">
       <template #header>
         <div class="space-y-1">
           <h2 class="text-xl font-bold text-gray-900">Profile Information</h2>
-          <p class="text-sm text-gray-600">
+          <p class="text-sm text-muted">
             Update your personal details and profile picture
           </p>
         </div>
       </template>
 
-      <div class="space-y-6">
-        <!-- Avatar Section -->
-        <div class="flex items-start gap-4 pb-6 border-b border-gray-200">
+      <div v-if="pending" class="p-8 text-center">
+        <p>Loading profile...</p>
+      </div>
+
+      <div v-else-if="error" class="p-8 text-center text-red-600">
+        <p>Error loading profile</p>
+      </div>
+
+      <div v-else class="space-y-6">
+        <div class="flex items-start gap-4">
           <UAvatar
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ante"
+            :src="state.image ?? undefined"
             alt="Profile picture"
-            size="xl"
+            size="3xl"
             class="shrink-0"
           />
-          <div class="flex flex-col gap-2">
-            <UButton variant="outline" color="neutral" size="sm">
+          <div class="flex flex-col space-y-1 items-start">
+            <UButton variant="outline" color="neutral" size="md">
               Change avatar
             </UButton>
-            <p class="text-xs text-gray-500">JPG, PNG or GIF. Max 2MB.</p>
+            <p class="text-xs text-dimmed">JPG, PNG or GIF. Max 2MB.</p>
           </div>
         </div>
 
-        <!-- Name Section -->
-        <div class="space-y-2 pb-6 border-b border-gray-200">
-          <label class="text-sm font-semibold text-gray-900">Name</label>
+        <USeparator />
+
+        <UFormField
+          name="name"
+          label="Name"
+          help="This is your display name. It will be visible to other users."
+        >
           <UInput
-            v-model="name"
+            v-model="state.name"
             placeholder="Enter your name"
             class="w-full"
             size="lg"
           />
-          <p class="text-xs text-gray-500">
-            This is your display name. It will be visible to other users.
-          </p>
-        </div>
+        </UFormField>
 
-        <!-- Email Section -->
-        <div class="space-y-2 pb-6">
-          <label class="text-sm font-semibold text-gray-900">Email</label>
+        <USeparator />
+
+        <UFormField
+          name="email"
+          label="Email"
+          help="Your email address is managed by your authentication provider."
+        >
           <UInput
-            v-model="email"
+            v-model="state.email"
             type="email"
             placeholder="Enter your email"
             class="w-full"
             size="lg"
+            icon="i-lucide-at-sign"
+            disabled
           />
-          <p class="text-xs text-gray-500">
-            Your email address is managed by your authentication provider.
-          </p>
-        </div>
+        </UFormField>
       </div>
 
       <template #footer>
         <div class="flex justify-start">
-          <UButton color="warning" size="lg"> Save changes </UButton>
+          <UButton type="submit" color="warning" size="lg"
+            >Save changes</UButton
+          >
         </div>
       </template>
     </UCard>
-  </div>
+  </UForm>
 </template>
