@@ -37,15 +37,21 @@ watch(
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
-    // TODO: Update profile
-    console.log(event.data);
+    const response = await $fetch('/api/user/profile', {
+      method: 'PATCH',
+      body: {
+        name: event.data.name,
+        image: event.data.image,
+      },
+    });
+
     toast.add({
       title: 'Success',
       description: 'Profile updated successfully',
       color: 'success',
     });
 
-    // await refresh();
+    refresh();
   } catch (err) {
     toast.add({
       title: 'Error',
