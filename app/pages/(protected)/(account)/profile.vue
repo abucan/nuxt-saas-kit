@@ -45,13 +45,15 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       },
     });
 
-    toast.add({
-      title: 'Success',
-      description: 'Profile updated successfully',
-      color: 'success',
-    });
+    if (response) {
+      toast.add({
+        title: 'Success',
+        description: 'Profile updated successfully',
+        color: 'success',
+      });
 
-    refresh();
+      refresh();
+    }
   } catch (err) {
     toast.add({
       title: 'Error',
@@ -79,11 +81,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         </div>
       </template>
 
-      <div v-if="pending" class="p-8 text-center">
-        <p>Loading profile...</p>
-      </div>
-
-      <div v-else-if="error" class="p-8 text-center text-red-600">
+      <div v-if="error" class="p-8 text-center text-red-600">
         <p>Error loading profile</p>
       </div>
 

@@ -4,21 +4,18 @@ import type { DropdownMenuItem } from '@nuxt/ui';
 defineProps<{ collapsed?: boolean }>();
 
 const colorMode = useColorMode();
-
-const user = ref({
-  name: 'Benjamin Canac',
-  avatar: {
-    src: 'https://github.com/benjamincanac.png',
-    alt: 'Benjamin Canac',
-  },
-});
+const { user } = useUser();
 
 const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       type: 'label',
-      label: user.value.name,
-      avatar: user.value.avatar,
+      label: user.value?.name ?? '',
+      avatar: {
+        src: user.value?.image ?? '',
+        alt: user.value?.name ?? '',
+      },
+      alt: user.value?.name ?? '',
       description: 'ante.bucan.st@gmail.com',
       ui: {
         itemLeadingAvatar: 'w-8 h-8',
@@ -103,8 +100,8 @@ const items = computed<DropdownMenuItem[][]>(() => [
         v-bind:name="collapsed ? undefined : user?.name"
         :description="collapsed ? undefined : 'ante.bucan.st@gmail.com'"
         :avatar="{
-          src: user?.avatar?.src,
-          alt: user?.avatar?.alt,
+          src: user?.image ?? '',
+          alt: user?.name ?? '',
         }"
         :ui="{ name: 'font-bold' }"
       />
